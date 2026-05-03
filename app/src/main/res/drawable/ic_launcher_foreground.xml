@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Launcher icon foreground: Kölner Dom Silhouette
+    Wird über ic_launcher_background.xml gelegt
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Left Tower -->
+    <path
+        android:pathData="M30,78 L30,52 L40,52 L40,78 Z"
+        android:fillColor="#C9A84C" />
+    <!-- Left spire -->
+    <path
+        android:pathData="M33,52 L33,28 L37,28 L37,52 Z"
+        android:fillColor="#F0D070" />
+    <path android:pathData="M35,14 L31,28 L39,28 Z" android:fillColor="#F0D070" />
+    <!-- Left cross -->
+    <path android:pathData="M34.3,17 L35.7,17 L35.7,24 L34.3,24 Z" android:fillColor="#FFFFFF" />
+    <path android:pathData="M33,19.5 L37,19.5 L37,20.5 L33,20.5 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Right Tower -->
+    <path
+        android:pathData="M68,78 L68,52 L78,52 L78,78 Z"
+        android:fillColor="#C9A84C" />
+    <!-- Right spire -->
+    <path
+        android:pathData="M71,52 L71,28 L75,28 L75,52 Z"
+        android:fillColor="#F0D070" />
+    <path android:pathData="M73,14 L69,28 L77,28 Z" android:fillColor="#F0D070" />
+    <!-- Right cross -->
+    <path android:pathData="M72.3,17 L73.7,17 L73.7,24 L72.3,24 Z" android:fillColor="#FFFFFF" />
+    <path android:pathData="M71,19.5 L75,19.5 L75,20.5 L71,20.5 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Nave -->
+    <path android:pathData="M40,78 L40,58 L68,58 L68,78 Z" android:fillColor="#8A7030" />
+    <!-- Nave gable -->
+    <path android:pathData="M38,58 L54,46 L70,58 Z" android:fillColor="#C9A84C" />
+    <!-- Rose window -->
+    <path android:pathData="M54,53 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" android:fillColor="#F0D070" />
+    <path android:pathData="M54,53 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" android:fillColor="#1A1614" />
+
+    <!-- Base -->
+    <path android:pathData="M26,78 L82,78 L82,82 L26,82 Z" android:fillColor="#C9A84C" />
+
+</vector>

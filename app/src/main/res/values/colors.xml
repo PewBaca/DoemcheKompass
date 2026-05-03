@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- NACHT-THEME (20:00–05:59): Anthrazit & Gold                       -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <color name="night_bg_dark">#0F0D0B</color>
+    <color name="night_bg_mid">#1A1614</color>
+    <color name="night_card_bg">#221E1B</color>
+    <color name="night_card_border">#3A3330</color>
+
+    <color name="night_gold">#C9A84C</color>
+    <color name="night_gold_light">#F0D070</color>
+    <color name="night_gold_dim">#8A7030</color>
+
+    <color name="night_text_primary">#F0D070</color>
+    <color name="night_text_secondary">#7A7068</color>
+    <color name="night_text_dim">#4A4438</color>
+
+    <color name="night_needle">#C9A84C</color>
+    <color name="night_north">#E05040</color>
+    <color name="night_btn_bg">#C9A84C</color>
+    <color name="night_btn_text">#0F0D0B</color>
+    <color name="night_divider">#C9A84C</color>
+    <color name="night_status_bar">#0F0D0B</color>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- TAG-THEME (06:00–19:59): Kölner Rot & Weiß                       -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <color name="day_bg_dark">#FAFAF8</color>
+    <color name="day_bg_mid">#F5F0EB</color>
+    <color name="day_card_bg">#FFFFFF</color>
+    <color name="day_card_border">#E8DDD5</color>
+
+    <!-- Kölner Dom Rot (Stadtfarbe) -->
+    <color name="day_red">#BE0000</color>
+    <color name="day_red_dark">#8A0000</color>
+    <color name="day_red_light">#E83030</color>
+    <color name="day_red_dim">#D06060</color>
+
+    <color name="day_text_primary">#1A0000</color>
+    <color name="day_text_secondary">#6A4040</color>
+    <color name="day_text_dim">#B09090</color>
+
+    <color name="day_needle">#BE0000</color>
+    <color name="day_north">#BE0000</color>
+    <color name="day_btn_bg">#BE0000</color>
+    <color name="day_btn_text">#FFFFFF</color>
+    <color name="day_divider">#BE0000</color>
+    <color name="day_status_bar">#8A0000</color>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SYSTEM (Material) – zeigt auf das aktive Theme                    -->
+    <!-- Diese werden per AppCompatDelegate / Theme überschrieben          -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <color name="colorPrimary">#C9A84C</color>
+    <color name="colorPrimaryVariant">#8A7030</color>
+    <color name="colorOnPrimary">#0F0D0B</color>
+    <color name="colorSecondary">#C9A84C</color>
+    <color name="colorOnSecondary">#0F0D0B</color>
+    <color name="colorSurface">#1A1614</color>
+    <color name="colorOnSurface">#F0D070</color>
+    <color name="colorBackground">#0F0D0B</color>
+    <color name="colorError">#CF6679</color>
+
+</resources>

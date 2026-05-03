@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Info -->
+    <string name="app_name">Dömche-Kompass</string>
+    <string name="subtitle">Dä Dom es immer noh hüm!</string>
+
+    <!-- Compass -->
+    <string name="compass_rose_desc">Kompassrose</string>
+    <string name="needle_desc">Pfeil zum Dom</string>
+    <string name="compass_init">Kompass weed gelode…</string>
+    <string name="compass_heading">Gerät: %1$d° · Dom: %2$d°</string>
+    <string name="compass_heading_only">Gerät zeigt: %1$d°</string>
+    <string name="no_compass_sensor">Kein Kompass-Sensor gefunde!</string>
+
+    <!-- Distance -->
+    <string name="distance_label">Entfernung vum Dom</string>
+    <string name="distance_searching">…</string>
+    <string name="distance_meters">%1$d m</string>
+    <string name="distance_km">%1$.1f km</string>
+
+    <!-- Webcam -->
+    <string name="webcam_button">Live-Webcam vom Dom ööffne</string>
+
+    <!-- Theme label -->
+    <string name="theme_day">☀️ Daachsdesing aktiv</string>
+    <string name="theme_night">🌙 Ovends-Design aktiv</string>
+
+    <!-- No GPS -->
+    <string name="status_no_gps">❌ Ohne GPS kann mer nix maache! Jib de Erlaubnis!</string>
+
+    <!-- GPS searching -->
+    <string-array name="sayings_gps_searching">
+        <item>📡 GPS weed gesuuch…</item>
+        <item>📡 Wo bes de överhaupt? Dä Dom froch och schon!</item>
+        <item>📡 Kurz wachde – mer finne dich schon!</item>
+    </string-array>
+
+    <!-- >500 km -->
+    <string-array name="sayings_very_far">
+        <item>🗺️ Bis dahin läuft noch vill Wasser de Rhing runner!</item>
+        <item>🗺️ Bisse jeck? So weit vum Dom? Et kütt wie et kütt!</item>
+        <item>🗺️ Vun nix kütt nix – pack dinge Koffer, Jecke!</item>
+        <item>🗺️ Do häs he jar nix zo kamelle – ävver der Dom wartet!</item>
+    </string-array>
+
+    <!-- 200–500 km -->
+    <string-array name="sayings_far">
+        <item>🚂 Et hät noch immer jot jejange – do schaffes dat och!</item>
+        <item>🚂 Noch weit, ävver: Et kütt wie et kütt!</item>
+        <item>🚂 Maach et jot, ävver kumm bald noh Kölle!</item>
+        <item>🚂 Küss de hück nit, küss de morje – ävver kumm!</item>
+    </string-array>
+
+    <!-- 50–200 km -->
+    <string-array name="sayings_medium_far">
+        <item>🚗 En paar Stunde met em Auto – maach dich op de Söck!</item>
+        <item>🚗 Och der Dom es nit an einem Daach jebaut wode – ävver do kanns flinker sin!</item>
+        <item>🚗 Jede Jeck fingt singe Wäch – do och!</item>
+        <item>🚗 Et es wie et es – ävver fahr schon mol loss!</item>
+    </string-array>
+
+    <!-- 10–50 km -->
+    <string-array name="sayings_getting_closer">
+        <item>🚗 Schon nöcher! Kölle Alaaf – do küss noh hüm!</item>
+        <item>🚗 Do häs et faß! Noch e kleins Eck, dann bes do do!</item>
+        <item>🚗 Jede Jeck es anders – ävver alle welle zum Dom!</item>
+        <item>🚗 Wat wellste maache? Einfach wigger fahre bis zum Dom!</item>
+    </string-array>
+
+    <!-- 2–10 km -->
+    <string-array name="sayings_close">
+        <item>🚶 En paar Minüte un do bes do! Drinkste ejne met?</item>
+        <item>🚶 Do staunste, wat? Schon faß beim Dom!</item>
+        <item>🚶 Küss de hück nit, küss de morje – ävver hück weed wat druss!</item>
+        <item>🚶 Mach et jot, ävver beeil dich – der Dom wartet!</item>
+    </string-array>
+
+    <!-- 0.5–2 km -->
+    <string-array name="sayings_very_close">
+        <item>🏃 Leck mich en de Täsch – do bes faß do!</item>
+        <item>🏃 Jetzt bes do so noh, dat de dä Dom ald sinn kanns!</item>
+        <item>🏃 Do packe mer uns an de Kopp – noch e paar Schritt!</item>
+        <item>🏃 Kölle Alaaf! Jetzt nur noch nit ze langsam!</item>
+    </string-array>
+
+    <!-- 0.1–0.5 km -->
+    <string-array name="sayings_almost_there">
+        <item>🏛️ Do riochst dä Dom ald – noch e paar Schritt!</item>
+        <item>🏛️ Do staunste, wat? Jetzt kannst de ald „Alaaf" roofe!</item>
+        <item>🏛️ Mer stonn faß do – Kölle Alaaf!</item>
+        <item>🏛️ Jetzt bes de su noh – dä Köbes sieht dich ald!</item>
+    </string-array>
+
+    <!-- <0.1 km – Beim Dom -->
+    <string-array name="sayings_at_dom">
+        <item>⛪ Do bes beim Dom! Hück Ovend Kölsch? Drinkste ejne met?</item>
+        <item>⛪ Kölle Alaaf! Willkumme beim schönste Dom op d\'r Welt!</item>
+        <item>⛪ Jede Jeck es anders – ävver alle kumme zum Dom! Willkumme!</item>
+        <item>⛪ Do packe mer uns an de Kopp vör Bewunderung! Schön, dat de do bes!</item>
+        <item>⛪ Liever den Darm em Leib verrenkt als dem Wirt ene Schluck jeschenkt – alaaf!</item>
+    </string-array>
+
+</resources>

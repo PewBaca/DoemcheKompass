@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Dom-Nadel: Zeigt immer in Richtung Kölner Dom.
+    Stilisierter Kirchturm als Pfeil – goldene Spitze oben, Gegengewicht unten.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+
+    <!-- ── NORTH half (points to DOM) ─ gold spire ─────────────────── -->
+
+    <!-- Main spire shaft -->
+    <path
+        android:pathData="M77,80 L77,30 L83,30 L83,80 Z"
+        android:fillColor="#C9A84C" />
+
+    <!-- Spire tip -->
+    <path
+        android:pathData="M80,10 L74,30 L86,30 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Cross at top of spire -->
+    <path
+        android:pathData="M79,15 L81,15 L81,22 L79,22 Z"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M77,17 L83,17 L83,18.5 L77,18.5 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Decorative banding on shaft -->
+    <path
+        android:pathData="M76,38 L84,38 L84,40 L76,40 Z"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M76,52 L84,52 L84,54 L76,54 Z"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M76,66 L84,66 L84,68 L76,68 Z"
+        android:fillColor="#8A7030" />
+
+    <!-- ── Center pivot circle ───────────────────────────────────────── -->
+    <path
+        android:pathData="M80,80 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M80,80 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0"
+        android:fillColor="#1A1614" />
+    <path
+        android:pathData="M80,80 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"
+        android:fillColor="#C9A84C" />
+
+    <!-- ── SOUTH half (counterweight) ─ dark stone ──────────────────── -->
+
+    <!-- Counterweight shaft -->
+    <path
+        android:pathData="M78,80 L78,118 L82,118 L82,80 Z"
+        android:fillColor="#5A5040" />
+
+    <!-- Counterweight teardrop -->
+    <path
+        android:pathData="M80,150 L74,118 L86,118 Z"
+        android:fillColor="#4A4030" />
+
+    <!-- Counterweight band -->
+    <path
+        android:pathData="M76,100 L84,100 L84,102 L76,102 Z"
+        android:fillColor="#3A3020" />
+
+</vector>

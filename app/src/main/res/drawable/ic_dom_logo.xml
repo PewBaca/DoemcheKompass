@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    KI-generiertes App-Logo: Kölner Dom – Zwei gotische Türme
+    Stilisierte Silhouette mit goldenen Türmen auf dunklem Hintergrund
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- ── Circular background ─────────────────────────────────────── -->
+    <path
+        android:pathData="M54,54 m-52,0 a52,52 0 1,0 104,0 a52,52 0 1,0 -104,0"
+        android:fillColor="#1A1614" />
+
+    <!-- ── Outer gold ring ─────────────────────────────────────────── -->
+    <path
+        android:pathData="M54,54 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0 M54,54 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0"
+        android:fillColor="#C9A84C" />
+
+    <!-- ── Inner circle ────────────────────────────────────────────── -->
+    <path
+        android:pathData="M54,54 m-47,0 a47,47 0 1,0 94,0 a47,47 0 1,0 -94,0"
+        android:fillColor="#0F0D0B" />
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- ── LEFT TOWER ──────────────────────────────────────────────── -->
+    <!-- Tower body -->
+    <path
+        android:pathData="M28,72 L28,45 L38,45 L38,72 Z"
+        android:fillColor="#3A3330" />
+
+    <!-- Tower top section -->
+    <path
+        android:pathData="M27,50 L39,50 L39,45 L27,45 Z"
+        android:fillColor="#4A4340" />
+
+    <!-- Left tower spire shaft -->
+    <path
+        android:pathData="M31,45 L31,22 L35,22 L35,45 Z"
+        android:fillColor="#C9A84C" />
+
+    <!-- Left spire tip (pointed) -->
+    <path
+        android:pathData="M33,10 L29,22 L37,22 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Left tower cross -->
+    <path
+        android:pathData="M32,14 L34,14 L34,18 L32,18 Z"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M31,15 L35,15 L35,16 L31,16 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Left tower windows (gothic arches) -->
+    <path
+        android:pathData="M30,54 Q33,50 36,54 L36,62 L30,62 Z"
+        android:fillColor="#C9A84C" />
+    <path
+        android:pathData="M30,66 Q33,62 36,66 L36,72 L30,72 Z"
+        android:fillColor="#8A7030" />
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- ── RIGHT TOWER ─────────────────────────────────────────────── -->
+    <!-- Tower body -->
+    <path
+        android:pathData="M70,72 L70,45 L80,45 L80,72 Z"
+        android:fillColor="#3A3330" />
+
+    <!-- Tower top section -->
+    <path
+        android:pathData="M69,50 L81,50 L81,45 L69,45 Z"
+        android:fillColor="#4A4340" />
+
+    <!-- Right tower spire shaft -->
+    <path
+        android:pathData="M73,45 L73,22 L77,22 L77,45 Z"
+        android:fillColor="#C9A84C" />
+
+    <!-- Right spire tip (pointed) -->
+    <path
+        android:pathData="M75,10 L71,22 L79,22 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Right tower cross -->
+    <path
+        android:pathData="M74,14 L76,14 L76,18 L74,18 Z"
+        android:fillColor="#F0D070" />
+    <path
+        android:pathData="M73,15 L77,15 L77,16 L73,16 Z"
+        android:fillColor="#F0D070" />
+
+    <!-- Right tower windows (gothic arches) -->
+    <path
+        android:pathData="M72,54 Q75,50 78,54 L78,62 L72,62 Z"
+        android:fillColor="#C9A84C" />
+    <path
+        android:pathData="M72,66 Q75,62 78,66 L78,72 L72,72 Z"
+        android:fillColor="#8A7030" />
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- ── MAIN NAVE ───────────────────────────────────────────────── -->
+    <path
+        android:pathData="M38,72 L38,52 L70,52 L70,72 Z"
+        android:fillColor="#2A2622" />
+
+    <!-- Nave roof (pointed gable) -->
+    <path
+        android:pathData="M36,52 L54,40 L72,52 Z"
+        android:fillColor="#3A3330" />
+
+    <!-- Rose window (circle) -->
+    <path
+        android:pathData="M54,48 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:fillColor="#C9A84C" />
+    <path
+        android:pathData="M54,48 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"
+        android:fillColor="#0F0D0B" />
+
+    <!-- Nave windows -->
+    <path
+        android:pathData="M42,57 Q45,53 48,57 L48,68 L42,68 Z"
+        android:fillColor="#C9A84C"
+        android:fillAlpha="0.7" />
+    <path
+        android:pathData="M60,57 Q63,53 66,57 L66,68 L60,68 Z"
+        android:fillColor="#C9A84C"
+        android:fillAlpha="0.7" />
+
+    <!-- ── Central portal arch ─────────────────────────────────────── -->
+    <path
+        android:pathData="M49,72 Q54,65 59,72 Z"
+        android:fillColor="#C9A84C" />
+
+    <!-- ── Ground base ─────────────────────────────────────────────── -->
+    <path
+        android:pathData="M24,72 L84,72 L84,75 L24,75 Z"
+        android:fillColor="#C9A84C" />
+    <path
+        android:pathData="M20,75 L88,75 L88,78 L20,78 Z"
+        android:fillColor="#8A7030" />
+
+</vector>

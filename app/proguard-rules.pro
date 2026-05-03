@@ -1,0 +1,2 @@
+-keep class de.doem.kompass.** { *; }
+-keepattributes *Annotation*
