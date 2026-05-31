@@ -3,6 +3,7 @@ package de.doem.kompass
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,11 +17,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.google.android.gms.location.*
 import de.doem.kompass.databinding.ActivityMainBinding
+import java.util.Calendar
 import kotlin.math.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -43,14 +49,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     // ── Sensors ───────────────────────────────────────────────────────────
     private lateinit var sensorManager: SensorManager
+
+    // Primary: TYPE_ROTATION_VECTOR (system-fused, always responsive)
+    private var rotationVectorSensor: Sensor? = null
+    private var useRotationVector = false
+
+    // Fallback for old devices without rotation vector
     private var accelerometer: Sensor? = null
     private var magnetometer: Sensor? = null
     private val accelReading = FloatArray(3)
     private val magReading   = FloatArray(3)
-    private val rotationMat  = FloatArray(9)
-    private val orientation  = FloatArray(3)
     private var hasAccel = false
     private var hasMag   = false
+
+    private val rotationMat  = FloatArray(9)
+    private val orientation  = FloatArray(3)
+    private var smoothAzimuth   = 0f
     private var currentAzimuth  = 0f
     private var bearingToDom    = 0f
     private var distanceKm      = 0.0
@@ -62,7 +76,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var locationCallback: LocationCallback? = null
     private var hasLocation = false
 
-    // ── Sayings cache ─────────────────────────────────────────────────────
+    // ── Sayings ───────────────────────────────────────────────────────────
     private var lastSayingBracket = ""
     private var cachedSaying      = ""
 
@@ -77,35 +91,58 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
         }
 
-    // ─────────────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         activeTheme = ThemeHelper.currentTheme()
         setTheme(ThemeHelper.themeResId(activeTheme))
         colors = ThemeHelper.Colors(this, activeTheme)
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top, bottom = bars.bottom,
+                               left = bars.left, right = bars.right)
+            insets
+        }
 
         applyThemeColors()
         setupSensors()
         setupLocation()
         setupWebcamButton()
         themeCheckHandler.postDelayed(themeCheckRunnable, 60_000L)
+        checkBirthday()
+    }
 
-        binding.tvThemeLabel.text = when (activeTheme) {
-            ThemeHelper.AppTheme.DAY   -> getString(R.string.theme_day)
-            ThemeHelper.AppTheme.NIGHT -> getString(R.string.theme_night)
+    // ── Geburtstag ────────────────────────────────────────────────────────
+    private val BIRTHDAY_DAY   = 6
+    private val BIRTHDAY_MONTH = 6
+
+    private fun checkBirthday() {
+        val cal = Calendar.getInstance()
+        if (cal.get(Calendar.DAY_OF_MONTH) == BIRTHDAY_DAY &&
+            cal.get(Calendar.MONTH) + 1     == BIRTHDAY_MONTH) {
+            Handler(Looper.getMainLooper()).postDelayed({ showBirthdayDialog() }, 1200)
         }
     }
 
-    // ── Apply theme colors to all views ───────────────────────────────────
+    private fun showBirthdayDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Alles Jode zum Jebootsdaach!")
+            .setMessage("Hück es ding Daach – loss et kraache!\n\nUn denk dran: Et hät noch immer jot jejange!")
+            .setPositiveButton("Un jetz mal Butter bei de Fische:\nAlles joot – un jetz her met däm Geschenk!") { d, _ -> d.dismiss() }
+            .setCancelable(true)
+            .show()
+            .also { it.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(colors.primary) }
+    }
+
+    // ── Theme colors ──────────────────────────────────────────────────────
     private fun applyThemeColors() {
         binding.root.setBackgroundColor(colors.bgDark)
         binding.viewGradient.setBackgroundColor(colors.bgMid)
         binding.tvAppTitle.setTextColor(colors.primaryLight)
         binding.tvSubtitle.setTextColor(colors.primaryDim)
-        binding.tvThemeLabel.setTextColor(colors.textDim)
         binding.dividerTop.setBackgroundColor(colors.divider)
         binding.tvCompassStatus.setTextColor(colors.textDim)
         binding.cardDistance.setCardBackgroundColor(colors.cardBg)
@@ -114,37 +151,40 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         binding.tvStatus.setTextColor(colors.textSecondary)
         binding.btnWebcam.setBackgroundColor(colors.btnBg)
         binding.btnWebcam.setTextColor(colors.btnText)
-        (binding.btnWebcam.icon)?.setTint(colors.btnText)
-
-        // Switch logo image based on theme
-        val logoRes = when (activeTheme) {
-            ThemeHelper.AppTheme.DAY   -> R.drawable.ic_app_logo_day
-            ThemeHelper.AppTheme.NIGHT -> R.drawable.ic_app_logo_night
-        }
-        binding.imgAppLogo.setImageResource(logoRes)
-
-        // Subtle pulse animation on the logo
+        binding.btnWebcam.icon?.setTint(colors.btnText)
+        binding.imgAppLogo.setImageResource(
+            if (activeTheme == ThemeHelper.AppTheme.DAY) R.drawable.ic_app_logo_day
+            else R.drawable.ic_app_logo_night
+        )
         ObjectAnimator.ofFloat(binding.imgAppLogo, "alpha", 1f, 0.85f, 1f).apply {
-            duration = 2800
-            repeatCount = ObjectAnimator.INFINITE
-            start()
+            duration = 2800; repeatCount = ObjectAnimator.INFINITE; start()
         }
     }
 
     // ── Sensors ───────────────────────────────────────────────────────────
     private fun setupSensors() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        magnetometer  = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-        if (accelerometer == null || magnetometer == null) {
-            binding.tvCompassStatus.text = getString(R.string.no_compass_sensor)
+        rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+        if (rotationVectorSensor != null) {
+            useRotationVector = true
+        } else {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+            magnetometer  = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+            if (accelerometer == null || magnetometer == null)
+                binding.tvCompassStatus.text = getString(R.string.no_compass_sensor)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        accelerometer?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
-        magnetometer?.also  { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
+        if (useRotationVector) {
+            rotationVectorSensor?.let {
+                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
+            }
+        } else {
+            accelerometer?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
+            magnetometer?.also  { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
+        }
         startLocationUpdates()
     }
 
@@ -157,33 +197,46 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type) {
-            Sensor.TYPE_ACCELEROMETER -> { lowPass(event.values, accelReading); hasAccel = true }
-            Sensor.TYPE_MAGNETIC_FIELD -> { lowPass(event.values, magReading); hasMag = true }
+            Sensor.TYPE_ROTATION_VECTOR -> {
+                SensorManager.getRotationMatrixFromVector(rotationMat, event.values)
+                SensorManager.getOrientation(rotationMat, orientation)
+                val raw = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
+                currentAzimuth = smoothAngle(smoothAzimuth, raw).also { smoothAzimuth = it }
+                updateUI()
+            }
+            Sensor.TYPE_ACCELEROMETER -> { lowPass(event.values, accelReading); hasAccel = true; if (hasAccel && hasMag) updateFromRaw() }
+            Sensor.TYPE_MAGNETIC_FIELD -> { lowPass(event.values, magReading); hasMag = true; if (hasAccel && hasMag) updateFromRaw() }
         }
-        if (hasAccel && hasMag) updateCompass()
+    }
+
+    private fun updateFromRaw() {
+        if (!SensorManager.getRotationMatrix(rotationMat, null, accelReading, magReading)) return
+        SensorManager.getOrientation(rotationMat, orientation)
+        val raw = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
+        currentAzimuth = smoothAngle(smoothAzimuth, raw).also { smoothAzimuth = it }
+        updateUI()
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun lowPass(input: FloatArray, output: FloatArray) {
-        val alpha = 0.08f
+        val alpha = 0.12f
         for (i in input.indices) output[i] = output[i] + alpha * (input[i] - output[i])
     }
 
-    private fun updateCompass() {
-        if (!SensorManager.getRotationMatrix(rotationMat, null, accelReading, magReading)) return
-        SensorManager.getOrientation(rotationMat, orientation)
-        currentAzimuth = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
-        updateUI()
+    private fun smoothAngle(current: Float, target: Float): Float {
+        val alpha = 0.15f
+        var diff = target - current
+        while (diff > 180f)  diff -= 360f
+        while (diff < -180f) diff += 360f
+        return (current + alpha * diff + 360f) % 360f
     }
 
     // ── Location ──────────────────────────────────────────────────────────
     private fun setupLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                result.lastLocation?.let { onNewLocation(it) }
-            }
+            override fun onLocationResult(result: LocationResult) { result.lastLocation?.let { onNewLocation(it) } }
         }
         checkAndRequestLocationPermission()
     }
@@ -191,12 +244,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun checkAndRequestLocationPermission() {
         val fine   = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) {
-            startLocationUpdates()
-        } else {
-            requestPermissionLauncher.launch(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-            )
+        if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) startLocationUpdates()
+        else {
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
             binding.tvStatus.text = resources.getStringArray(R.array.sayings_gps_searching).random()
         }
     }
@@ -206,8 +256,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val fine   = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (fine != PackageManager.PERMISSION_GRANTED && coarse != PackageManager.PERMISSION_GRANTED) return
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000L)
-            .setMinUpdateIntervalMillis(1500L).build()
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000L).setMinUpdateIntervalMillis(1500L).build()
         fusedLocationClient.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
         fusedLocationClient.lastLocation.addOnSuccessListener { it?.let { loc -> onNewLocation(loc) } }
     }
@@ -219,10 +268,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         updateUI()
     }
 
-    // ── Maths ─────────────────────────────────────────────────────────────
     private fun calcBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val φ1 = Math.toRadians(lat1); val φ2 = Math.toRadians(lat2)
-        val Δλ = Math.toRadians(lon2 - lon1)
+        val φ1 = Math.toRadians(lat1); val φ2 = Math.toRadians(lat2); val Δλ = Math.toRadians(lon2 - lon1)
         return (Math.toDegrees(atan2(sin(Δλ)*cos(φ2), cos(φ1)*sin(φ2)-sin(φ1)*cos(φ2)*cos(Δλ))) + 360) % 360
     }
 
@@ -232,16 +279,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return 6371.0 * 2 * atan2(sqrt(a), sqrt(1-a))
     }
 
-    // ── Kölsche Sprüche ───────────────────────────────────────────────────
     private fun bracketFor(km: Double) = when {
-        km < 0.1   -> "at_dom"
-        km < 0.5   -> "almost_there"
-        km < 2.0   -> "very_close"
-        km < 10.0  -> "close"
-        km < 50.0  -> "getting_closer"
-        km < 200.0 -> "medium_far"
-        km < 500.0 -> "far"
-        else       -> "very_far"
+        km < 0.1 -> "at_dom"; km < 0.5 -> "almost_there"; km < 2.0 -> "very_close"
+        km < 10.0 -> "close"; km < 50.0 -> "getting_closer"; km < 200.0 -> "medium_far"
+        km < 500.0 -> "far"; else -> "very_far"
     }
 
     private fun sayingForDistance(km: Double): String {
@@ -254,19 +295,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return cachedSaying
     }
 
-    // ── UI Update ─────────────────────────────────────────────────────────
     private fun updateUI() {
-        val roseTarget = -currentAzimuth
-        rotateTo(binding.imgCompassRose, roseTarget, lastRoseAngle) { lastRoseAngle = it }
-
+        rotateTo(binding.imgCompassRose, -currentAzimuth, lastRoseAngle) { lastRoseAngle = it }
         if (hasLocation) {
-            val needleTarget = bearingToDom - currentAzimuth
-            rotateTo(binding.imgDomArrow, needleTarget, lastNeedleAngle) { lastNeedleAngle = it }
-            binding.tvDistance.text = formatDistance(distanceKm)
-            binding.tvStatus.text   = sayingForDistance(distanceKm)
+            rotateTo(binding.imgDomArrow, bearingToDom - currentAzimuth, lastNeedleAngle) { lastNeedleAngle = it }
+            binding.tvDistance.text      = formatDistance(distanceKm)
+            binding.tvStatus.text        = sayingForDistance(distanceKm)
             binding.tvCompassStatus.text = getString(R.string.compass_heading, currentAzimuth.toInt(), bearingToDom.toInt())
         } else {
-            binding.tvStatus.text = resources.getStringArray(R.array.sayings_gps_searching).random()
+            binding.tvStatus.text        = resources.getStringArray(R.array.sayings_gps_searching).random()
             binding.tvCompassStatus.text = getString(R.string.compass_heading_only, currentAzimuth.toInt())
         }
     }
@@ -277,7 +314,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val newAngle = last + delta
         onUpdate(newAngle)
         ObjectAnimator.ofFloat(view, "rotation", view.rotation, newAngle).apply {
-            duration = 250; interpolator = DecelerateInterpolator(); start()
+            duration = 200; interpolator = DecelerateInterpolator(); start()
         }
     }
 
@@ -286,12 +323,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         else     -> getString(R.string.distance_km, km).replace(".", ",")
     }
 
-    // ── Webcam ────────────────────────────────────────────────────────────
     private fun setupWebcamButton() {
         binding.btnWebcam.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(
-                "https://www.skylinewebcams.com/en/webcam/deutschland/north-rhine-westphalia/cologne/cathedral.html"
-            )))
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/live/kodtgRure8Y")))
         }
     }
 }

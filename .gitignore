@@ -1,60 +1,61 @@
-# ── Android ───────────────────────────────────────────────────────────────
+# ── Build outputs ─────────────────────────────────────────────────────────
+/build/
+app/build/
+
+# ── Gradle ────────────────────────────────────────────────────────────────
+.gradle/
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# ── Gradle cache (wird im Projektordner angelegt wenn Wrapper genutzt wird) ──
+caches/
+daemon/
+native/
+wrapper/
+jdks/
+kotlin-profile/
+notifications/
+
+# ── Android Studio / IntelliJ ─────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/deploymentTargetDropDown.xml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ── Local config (NIEMALS einchecken) ─────────────────────────────────────
+local.properties
+
+# ── Keystore – NIEMALS einchecken! ────────────────────────────────────────
+*.jks
+*.keystore
+keystore.properties
+release/
+
+# ── APK / AAB ─────────────────────────────────────────────────────────────
 *.apk
 *.aab
 *.ap_
 *.dex
-*.class
 
-# Built application files
-/app/build/
-/build/
-
-# Generated files
-bin/
-gen/
-out/
-release/
-
-# Gradle files
-.gradle/
-local.properties
-gradle-wrapper.jar
-
-# Android Studio / IntelliJ ───────────────────────────────────────────────
-*.iml
-.idea/
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/caches
-.idea/modules.xml
-.idea/*.xml
-.idea/navEditor.xml
-.idea/deploymentTargetDropDown.xml
-.DS_Store
-captures/
-.externalNativeBuild/
-.cxx/
-*.orig
-
-# Keystore files – NIEMALS einchecken!
-*.jks
-*.keystore
-keystore.properties
-
-# ProGuard
-proguard/
-
-# Log files
+# ── Logs ──────────────────────────────────────────────────────────────────
 *.log
 
-# Windows
+# ── OS-Dateien ────────────────────────────────────────────────────────────
+.DS_Store
 Thumbs.db
-ehthumbs.db
 Desktop.ini
 
-# NDK
-obj/
+# ── ProGuard ──────────────────────────────────────────────────────────────
+proguard/

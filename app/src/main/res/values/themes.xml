@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- BASE: referenced by AndroidManifest, defaults to Night -->
+    <!--
+        BASE THEME – referenced by AndroidManifest.xml.
+        The actual theme (Day/Night) is applied programmatically in MainActivity.onCreate()
+        via setTheme() BEFORE super.onCreate(), so this just needs to exist as a valid fallback.
+        We default to Night so cold-start before setTheme() looks correct.
+    -->
     <style name="Theme.DoemcheKompass" parent="Theme.DoemcheKompass.Night" />
 
-    <!-- NACHT: Anthrazit & Gold (20:00–05:59) -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- NACHT-THEME: Anthrazit & Gold (20:00–05:59)                       -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
     <style name="Theme.DoemcheKompass.Night" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/night_gold</item>
         <item name="colorPrimaryVariant">@color/night_gold_dim</item>
@@ -14,14 +21,16 @@
         <item name="android:colorBackground">@color/night_bg_dark</item>
         <item name="colorSurface">@color/night_bg_mid</item>
         <item name="colorOnSurface">@color/night_text_primary</item>
-        <item name="colorError">#CF6679</item>
+        <item name="colorError">@color/colorError</item>
         <item name="android:statusBarColor">@color/night_status_bar</item>
         <item name="android:navigationBarColor">@color/night_bg_dark</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowBackground">@color/night_bg_dark</item>
     </style>
 
-    <!-- TAG: Kölner Rot & Weiß (06:00–19:59) -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- TAG-THEME: Kölner Rot & Weiß (06:00–19:59)                       -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
     <style name="Theme.DoemcheKompass.Day" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/day_red</item>
         <item name="colorPrimaryVariant">@color/day_red_dark</item>
@@ -31,7 +40,7 @@
         <item name="android:colorBackground">@color/day_bg_dark</item>
         <item name="colorSurface">@color/day_card_bg</item>
         <item name="colorOnSurface">@color/day_text_primary</item>
-        <item name="colorError">#CF6679</item>
+        <item name="colorError">@color/colorError</item>
         <item name="android:statusBarColor">@color/day_status_bar</item>
         <item name="android:navigationBarColor">@color/day_bg_mid</item>
         <item name="android:windowLightStatusBar">false</item>

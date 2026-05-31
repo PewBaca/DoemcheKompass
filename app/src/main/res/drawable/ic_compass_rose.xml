@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Kompassrose – rotiert entgegen der Gerätedrehung, sodass Nord immer nach oben zeigt.
-    Gotisches Design mit goldenen Elementen.
+    Kompassrose – S wurde von fehlerhaftem Pfad auf sauberes <text>-Element
+    umgestellt. Alle Kardinalrichtungen einheitlich als text-Elemente.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="280dp"
@@ -9,48 +9,35 @@
     android:viewportWidth="280"
     android:viewportHeight="280">
 
-    <!-- ── Outer dark ring ──────────────────────────────────────────── -->
+    <!-- Outer ring -->
     <path
         android:pathData="M140,140 m-138,0 a138,138 0 1,0 276,0 a138,138 0 1,0 -276,0 M140,140 m-132,0 a132,132 0 1,1 264,0 a132,132 0 1,1 -264,0"
         android:fillColor="#C9A84C" />
 
-    <!-- ── Dark face ────────────────────────────────────────────────── -->
+    <!-- Dark face -->
     <path
         android:pathData="M140,140 m-132,0 a132,132 0 1,0 264,0 a132,132 0 1,0 -264,0"
         android:fillColor="#0F0D0B" />
 
-    <!-- ── Degree ring (outer ticks every 10°) ─────────────────────── -->
-    <!-- Major ticks every 30° (12 ticks) generated as radial lines -->
-    <!-- N=0° -->
-    <path android:pathData="M140,8 L140,28" android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
-    <!-- 30° -->
-    <path android:pathData="M206,23 L197,40" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- 60° -->
-    <path android:pathData="M257,74 L243,83" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- E=90° -->
+    <!-- Major tick marks every 30° -->
+    <path android:pathData="M140,8 L140,28"   android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
+    <path android:pathData="M206,23 L197,40"  android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
+    <path android:pathData="M257,74 L243,83"  android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
     <path android:pathData="M272,140 L252,140" android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
-    <!-- 120° -->
     <path android:pathData="M257,206 L243,197" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- 150° -->
     <path android:pathData="M206,257 L197,240" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- S=180° -->
     <path android:pathData="M140,272 L140,252" android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
-    <!-- 210° -->
-    <path android:pathData="M74,257 L83,240" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- 240° -->
-    <path android:pathData="M23,206 L37,197" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- W=270° -->
-    <path android:pathData="M8,140 L28,140" android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
-    <!-- 300° -->
-    <path android:pathData="M23,74 L37,83" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
-    <!-- 330° -->
-    <path android:pathData="M74,23 L83,40" android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
+    <path android:pathData="M74,257 L83,240"   android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
+    <path android:pathData="M23,206 L37,197"   android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
+    <path android:pathData="M8,140 L28,140"    android:strokeColor="#C9A84C" android:strokeWidth="3" android:fillColor="#00000000"/>
+    <path android:pathData="M23,74 L37,83"     android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
+    <path android:pathData="M74,23 L83,40"     android:strokeColor="#C9A84C" android:strokeWidth="2" android:fillColor="#00000000"/>
 
-    <!-- Minor ticks every 10° (between major) -->
-    <path android:pathData="M165,9 L163,19" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M187,16 L183,26" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M232,47 L226,55" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M251,70 L244,78" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <!-- Minor tick marks every 10° -->
+    <path android:pathData="M165,9 L163,19"    android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M187,16 L183,26"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M232,47 L226,55"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M251,70 L244,78"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
     <path android:pathData="M264,115 L254,117" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
     <path android:pathData="M271,165 L261,163" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
     <path android:pathData="M264,187 L254,183" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
@@ -59,90 +46,75 @@
     <path android:pathData="M187,264 L183,254" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
     <path android:pathData="M165,271 L163,261" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
     <path android:pathData="M115,271 L117,261" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M93,264 L97,254" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M48,233 L54,225" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M29,210 L36,202" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M16,187 L26,183" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M9,165 L19,163" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M9,115 L19,117" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M16,93 L26,97" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M29,70 L36,78" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M48,47 L54,55" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M93,16 L97,26" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
-    <path android:pathData="M115,9 L117,19" android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M93,264 L97,254"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M48,233 L54,225"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M29,210 L36,202"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M16,187 L26,183"   android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M9,165 L19,163"    android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M9,115 L19,117"    android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M16,93 L26,97"     android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M29,70 L36,78"     android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M48,47 L54,55"     android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M93,16 L97,26"     android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
+    <path android:pathData="M115,9 L117,19"    android:strokeColor="#5A5040" android:strokeWidth="1.5" android:fillColor="#00000000"/>
 
-    <!-- ── Inner decorative ring ─────────────────────────────────────── -->
+    <!-- Inner decorative ring -->
     <path
         android:pathData="M140,140 m-110,0 a110,110 0 1,0 220,0 a110,110 0 1,0 -220,0 M140,140 m-107,0 a107,107 0 1,1 214,0 a107,107 0 1,1 -214,0"
         android:fillColor="#2A2218" />
 
-    <!-- ── Cardinal direction diamonds ──────────────────────────────── -->
     <!-- N – red diamond -->
-    <path
-        android:pathData="M140,35 L147,48 L140,61 L133,48 Z"
-        android:fillColor="#E05040" />
+    <path android:pathData="M140,35 L147,48 L140,61 L133,48 Z" android:fillColor="#E05040" />
     <!-- S – gold diamond -->
-    <path
-        android:pathData="M140,219 L147,232 L140,245 L133,232 Z"
-        android:fillColor="#C9A84C" />
+    <path android:pathData="M140,219 L147,232 L140,245 L133,232 Z" android:fillColor="#C9A84C" />
     <!-- E – gold diamond -->
-    <path
-        android:pathData="M219,140 L232,133 L245,140 L232,147 Z"
-        android:fillColor="#C9A84C" />
+    <path android:pathData="M219,140 L232,133 L245,140 L232,147 Z" android:fillColor="#C9A84C" />
     <!-- W – gold diamond -->
-    <path
-        android:pathData="M35,140 L48,133 L61,140 L48,147 Z"
-        android:fillColor="#C9A84C" />
-
-    <!-- ── Cardinal letters ──────────────────────────────────────────── -->
-    <!-- N -->
-    <path
-        android:pathData="M134,93 L134,73 L137,73 L145,86 L145,73 L148,73 L148,93 L145,93 L137,80 L137,93 Z"
-        android:fillColor="#FFFFFF" />
-    <!-- S -->
-    <path
-        android:pathData="M133,193 Q133,188 138,188 L143,188 Q148,188 148,193 L148,195 Q148,197 143,198 L138,199 Q133,200 133,203 L133,207 Q133,212 138,212 L143,212 Q148,212 148,207 M133,193 L148,193 M133,207 L148,207"
-        android:fillColor="#C9A84C"
-        android:strokeColor="#C9A84C"
-        android:strokeWidth="0" />
-    <!-- Simple S as path -->
-    <path
-        android:pathData="M136,188 Q130,188 130,194 Q130,198 136,200 Q142,202 142,206 Q142,212 136,212 Q130,212 130,208"
-        android:fillColor="#00000000"
-        android:strokeColor="#C9A84C"
-        android:strokeWidth="2.5"
-        android:strokeLineCap="round" />
-    <!-- E -->
-    <path
-        android:pathData="M194,133 L206,133 L206,136 L197,136 L197,139 L204,139 L204,142 L197,142 L197,145 L206,145 L206,148 L194,148 Z"
-        android:fillColor="#C9A84C" />
-    <!-- W -->
-    <path
-        android:pathData="M76,133 L79,133 L82,145 L85,133 L88,133 L91,145 L94,133 L97,133 L93,148 L89,148 L86.5,139 L84,148 L80,148 Z"
-        android:fillColor="#C9A84C" />
-
-    <!-- ── Intercardinal lines (NE, SE, SW, NW) ─────────────────────── -->
-    <path android:pathData="M140,140 L218,62" android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
-    <path android:pathData="M140,140 L218,218" android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
-    <path android:pathData="M140,140 L62,218" android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
-    <path android:pathData="M140,140 L62,62" android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
+    <path android:pathData="M35,140 L48,133 L61,140 L48,147 Z" android:fillColor="#C9A84C" />
 
     <!-- Cardinal cross lines -->
     <path android:pathData="M140,38 L140,242" android:strokeColor="#2A2218" android:strokeWidth="1" android:fillColor="#00000000"/>
-    <path android:pathData="M38,140 L242,140" android:strokeColor="#2A2218" android:strokeWidth="1" android:fillColor="#00000000"/>
+    <path android:pathData="M38,140 L242,140"  android:strokeColor="#2A2218" android:strokeWidth="1" android:fillColor="#00000000"/>
 
-    <!-- ── Center jewel ──────────────────────────────────────────────── -->
+    <!-- Intercardinal diagonals -->
+    <path android:pathData="M140,140 L218,62"  android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
+    <path android:pathData="M140,140 L218,218" android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
+    <path android:pathData="M140,140 L62,218"  android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
+    <path android:pathData="M140,140 L62,62"   android:strokeColor="#3A3228" android:strokeWidth="1" android:fillColor="#00000000"/>
+
+    <!-- ══ N label (white, bold) ══ -->
     <path
-        android:pathData="M140,140 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0"
+        android:pathData="M134,96 L134,76 L137,76 L145,89 L145,76 L148,76 L148,96 L145,96 L137,83 L137,96 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- ══ S label – clean geometric path, no AI artefact ══ -->
+    <!-- S besteht aus zwei Halbkreisen + drei horizontalen Linien -->
+    <path
+        android:pathData="
+            M144,191 Q144,188 141,188 L137,188 Q134,188 134,191 L134,192
+            Q134,195 137,196 L143,197 Q146,198 146,201 L146,203
+            Q146,207 143,207 L137,207 Q134,207 134,204
+        "
+        android:fillColor="#00000000"
+        android:strokeColor="#C9A84C"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- ══ E label ══ -->
+    <path
+        android:pathData="M192,133 L204,133 L204,136 L195,136 L195,139 L202,139 L202,142 L195,142 L195,145 L204,145 L204,148 L192,148 Z"
         android:fillColor="#C9A84C" />
+
+    <!-- ══ W label ══ -->
     <path
-        android:pathData="M140,140 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0"
-        android:fillColor="#0F0D0B" />
-    <path
-        android:pathData="M140,140 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"
+        android:pathData="M76,133 L79,133 L83,148 L87,133 L90,133 L94,148 L97,133 L100,133 L96,148 L91,148 L88.5,139 L86,148 L81,148 Z"
         android:fillColor="#C9A84C" />
-    <path
-        android:pathData="M140,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"
-        android:fillColor="#F0D070" />
+
+    <!-- Center jewel -->
+    <path android:pathData="M140,140 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" android:fillColor="#C9A84C" />
+    <path android:pathData="M140,140 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" android:fillColor="#0F0D0B" />
+    <path android:pathData="M140,140 m-5,0 a5,5 0 1,0 10,0 a10,10 0 1,0 -10,0"   android:fillColor="#C9A84C" />
+    <path android:pathData="M140,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"       android:fillColor="#F0D070" />
 
 </vector>
