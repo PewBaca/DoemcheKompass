@@ -15,14 +15,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.DoemcheKompass"
-        android:hardwareAccelerated="true">
+        android:hardwareAccelerated="true"
+        android:enableOnBackInvokedCallback="true">
 
+        <!-- API 35/36: screenOrientation portrait still works on phones (<600dp).
+             On large screens ≥600dp the system ignores it (Android 16 behaviour).
+             windowOptOutEdgeToEdgeEnforcement is IGNORED in API 36 – edge-to-edge
+             is handled via enableEdgeToEdge() + WindowInsets in MainActivity. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="adjustPan">
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
