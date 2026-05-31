@@ -11,8 +11,8 @@ android {
         applicationId = "de.doem.kompass"
         minSdk = 24
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1.1"
+        versionCode = 2
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -48,6 +48,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("androidx.cardview:cardview:1.0.0")
-    // Edge-to-edge API 35/36 – enableEdgeToEdge()
     implementation("androidx.activity:activity-ktx:1.9.0")
 }
