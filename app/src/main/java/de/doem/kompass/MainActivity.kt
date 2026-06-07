@@ -15,8 +15,10 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
-import android.view.animation.DecelerateInterpolator
+import android.view.Choreographer
+import android.view.animation.LinearInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -50,35 +52,61 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // ── Sensors ───────────────────────────────────────────────────────────
     private lateinit var sensorManager: SensorManager
 
-    // Primary: TYPE_ROTATION_VECTOR (system-fused, always responsive)
+    // FIX 4: Dedicated background thread for sensor processing
+    // Sensor callbacks no longer block the Main/UI thread
+    private lateinit var sensorThread: HandlerThread
+    private lateinit var sensorHandler: Handler
+
     private var rotationVectorSensor: Sensor? = null
     private var useRotationVector = false
-
-    // Fallback for old devices without rotation vector
     private var accelerometer: Sensor? = null
     private var magnetometer: Sensor? = null
     private val accelReading = FloatArray(3)
     private val magReading   = FloatArray(3)
     private var hasAccel = false
     private var hasMag   = false
+    private val rotationMat = FloatArray(9)
+    private val orientation = FloatArray(3)
 
-    private val rotationMat  = FloatArray(9)
-    private val orientation  = FloatArray(3)
-    private var smoothAzimuth   = 0f
-    private var currentAzimuth  = 0f
+    // FIX 1: Higher alpha = faster, more responsive compass
+    // 0.15 (old) took ~580ms to reach target. 0.35 takes ~250ms.
+    private val SMOOTH_ALPHA = 0.35f
+
+    // FIX 3: Only update UI when angle changed more than threshold
+    private val MIN_DELTA_DEG = 0.8f
+
+    @Volatile private var smoothAzimuth   = 0f
+    @Volatile private var currentAzimuth  = 0f
     private var bearingToDom    = 0f
     private var distanceKm      = 0.0
-    private var lastNeedleAngle = 0f
     private var lastRoseAngle   = 0f
+    private var lastNeedleAngle = 0f
+
+    // FIX 2: Reusable animators – created once, updated on each frame
+    private var roseAnimator:   ObjectAnimator? = null
+    private var needleAnimator: ObjectAnimator? = null
+
+    // FIX 3: Choreographer-driven UI updates – synced to display refresh rate
+    // instead of triggering on every sensor event (50Hz vs 60/120Hz mismatch)
+    private var choreographerScheduled = false
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val frameCallback = Choreographer.FrameCallback {
+        choreographerScheduled = false
+        renderFrame()
+    }
 
     // ── Location ──────────────────────────────────────────────────────────
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationCallback: LocationCallback? = null
     private var hasLocation = false
 
-    // ── Sayings ───────────────────────────────────────────────────────────
+    // ── Sayings cache ─────────────────────────────────────────────────────
     private var lastSayingBracket = ""
     private var cachedSaying      = ""
+    // FIX 3: Cache last displayed values to skip redundant setText calls
+    private var lastDisplayedAzimuth = -1
+    private var lastDisplayedBearing = -1
 
     // ── Permissions ───────────────────────────────────────────────────────
     private val requestPermissionLauncher =
@@ -91,6 +119,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
         }
 
+    // ─────────────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         activeTheme = ThemeHelper.currentTheme()
@@ -105,6 +134,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             view.updatePadding(top = bars.top, bottom = bars.bottom,
                                left = bars.left, right = bars.right)
             insets
+        }
+
+        // FIX 2: Pre-create reusable animators with hardware layer
+        // Hardware layer = GPU compositing, no CPU redraw on rotation
+        binding.imgCompassRose.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+        binding.imgDomArrow.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+
+        roseAnimator = ObjectAnimator.ofFloat(binding.imgCompassRose, "rotation", 0f).apply {
+            duration = 150
+            interpolator = LinearInterpolator()
+        }
+        needleAnimator = ObjectAnimator.ofFloat(binding.imgDomArrow, "rotation", 0f).apply {
+            duration = 150
+            interpolator = LinearInterpolator()
         }
 
         applyThemeColors()
@@ -122,8 +165,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun checkBirthday() {
         val cal = Calendar.getInstance()
         if (cal.get(Calendar.DAY_OF_MONTH) == BIRTHDAY_DAY &&
-            cal.get(Calendar.MONTH) + 1     == BIRTHDAY_MONTH) {
-            Handler(Looper.getMainLooper()).postDelayed({ showBirthdayDialog() }, 1200)
+            cal.get(Calendar.MONTH) + 1 == BIRTHDAY_MONTH) {
+            mainHandler.postDelayed({ showBirthdayDialog() }, 1200)
         }
     }
 
@@ -177,13 +220,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onResume() {
         super.onResume()
+
+        // FIX 4: Start background sensor thread
+        sensorThread = HandlerThread("SensorThread", android.os.Process.THREAD_PRIORITY_MORE_FAVORABLE).also { it.start() }
+        sensorHandler = Handler(sensorThread.looper)
+
         if (useRotationVector) {
             rotationVectorSensor?.let {
-                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
+                // FIX 4: Register on background thread, not Main thread
+                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME, sensorHandler)
             }
         } else {
-            accelerometer?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
-            magnetometer?.also  { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI) }
+            accelerometer?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI, sensorHandler) }
+            magnetometer?.also  { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_UI, sensorHandler) }
         }
         startLocationUpdates()
     }
@@ -191,30 +240,63 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(this)
+        sensorThread.quitSafely()
         locationCallback?.let { fusedLocationClient.removeLocationUpdates(it) }
         themeCheckHandler.removeCallbacks(themeCheckRunnable)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        roseAnimator?.cancel()
+        needleAnimator?.cancel()
+        binding.imgCompassRose.setLayerType(android.view.View.LAYER_TYPE_NONE, null)
+        binding.imgDomArrow.setLayerType(android.view.View.LAYER_TYPE_NONE, null)
+    }
+
+    // FIX 4: Called on background thread – pure math, no UI touches
     override fun onSensorChanged(event: SensorEvent) {
-        when (event.sensor.type) {
+        val raw: Float = when (event.sensor.type) {
             Sensor.TYPE_ROTATION_VECTOR -> {
                 SensorManager.getRotationMatrixFromVector(rotationMat, event.values)
                 SensorManager.getOrientation(rotationMat, orientation)
-                val raw = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
-                currentAzimuth = smoothAngle(smoothAzimuth, raw).also { smoothAzimuth = it }
-                updateUI()
+                ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
             }
-            Sensor.TYPE_ACCELEROMETER -> { lowPass(event.values, accelReading); hasAccel = true; if (hasAccel && hasMag) updateFromRaw() }
-            Sensor.TYPE_MAGNETIC_FIELD -> { lowPass(event.values, magReading); hasMag = true; if (hasAccel && hasMag) updateFromRaw() }
+            Sensor.TYPE_ACCELEROMETER -> {
+                lowPass(event.values, accelReading); hasAccel = true
+                if (!hasAccel || !hasMag) return
+                if (!SensorManager.getRotationMatrix(rotationMat, null, accelReading, magReading)) return
+                SensorManager.getOrientation(rotationMat, orientation)
+                ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
+            }
+            Sensor.TYPE_MAGNETIC_FIELD -> {
+                lowPass(event.values, magReading); hasMag = true
+                if (!hasAccel || !hasMag) return
+                if (!SensorManager.getRotationMatrix(rotationMat, null, accelReading, magReading)) return
+                SensorManager.getOrientation(rotationMat, orientation)
+                ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
+            }
+            else -> return
         }
-    }
 
-    private fun updateFromRaw() {
-        if (!SensorManager.getRotationMatrix(rotationMat, null, accelReading, magReading)) return
-        SensorManager.getOrientation(rotationMat, orientation)
-        val raw = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360f) % 360f
-        currentAzimuth = smoothAngle(smoothAzimuth, raw).also { smoothAzimuth = it }
-        updateUI()
+        // FIX 1: Smooth on background thread with higher alpha
+        val smoothed = smoothAngle(smoothAzimuth, raw)
+        smoothAzimuth = smoothed
+
+        // FIX 3: Only schedule a frame if angle changed meaningfully
+        val delta = abs(smoothed - currentAzimuth)
+        val wrappedDelta = if (delta > 180f) 360f - delta else delta
+        if (wrappedDelta < MIN_DELTA_DEG) return
+
+        currentAzimuth = smoothed
+
+        // FIX 3: Post to Choreographer – batches all sensor updates
+        // into exactly one UI update per display frame (60 or 120Hz)
+        if (!choreographerScheduled) {
+            choreographerScheduled = true
+            mainHandler.post {
+                Choreographer.getInstance().postFrameCallback(frameCallback)
+            }
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
@@ -224,19 +306,66 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         for (i in input.indices) output[i] = output[i] + alpha * (input[i] - output[i])
     }
 
+    // FIX 1: alpha = 0.35 → much faster response on all devices
     private fun smoothAngle(current: Float, target: Float): Float {
-        val alpha = 0.15f
         var diff = target - current
         while (diff > 180f)  diff -= 360f
         while (diff < -180f) diff += 360f
-        return (current + alpha * diff + 360f) % 360f
+        return (current + SMOOTH_ALPHA * diff + 360f) % 360f
+    }
+
+    // ── FIX 3: Single render call per display frame via Choreographer ─────
+    private fun renderFrame() {
+        val azimuth = currentAzimuth
+
+        // Compass rose counter-rotates to stay North-up
+        rotateTo(binding.imgCompassRose, -azimuth, lastRoseAngle, roseAnimator) { lastRoseAngle = it }
+
+        if (hasLocation) {
+            rotateTo(binding.imgDomArrow, bearingToDom - azimuth, lastNeedleAngle, needleAnimator) { lastNeedleAngle = it }
+
+            // FIX 3: Only update text if value actually changed
+            val azInt = azimuth.toInt()
+            val brInt = bearingToDom.toInt()
+            if (azInt != lastDisplayedAzimuth || brInt != lastDisplayedBearing) {
+                binding.tvCompassStatus.text = getString(R.string.compass_heading, azInt, brInt)
+                lastDisplayedAzimuth = azInt
+                lastDisplayedBearing = brInt
+            }
+        } else {
+            binding.tvCompassStatus.text = getString(R.string.compass_heading_only, azimuth.toInt())
+        }
+    }
+
+    // FIX 2: Reuse existing animator – just update target value
+    private fun rotateTo(
+        view: android.view.View,
+        target: Float,
+        last: Float,
+        animator: ObjectAnimator?,
+        onUpdate: (Float) -> Unit
+    ) {
+        var delta = ((target - last + 180f) % 360f - 180f + 360f) % 360f
+        if (delta > 180f) delta -= 360f
+        val newAngle = last + delta
+        onUpdate(newAngle)
+
+        if (animator != null) {
+            animator.cancel()
+            animator.setFloatValues(view.rotation, newAngle)
+            animator.start()
+        } else {
+            view.rotation = newAngle
+        }
     }
 
     // ── Location ──────────────────────────────────────────────────────────
     private fun setupLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) { result.lastLocation?.let { onNewLocation(it) } }
+            override fun onLocationResult(result: LocationResult) {
+                result.lastLocation?.let { onNewLocation(it) }
+            }
         }
         checkAndRequestLocationPermission()
     }
@@ -244,9 +373,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun checkAndRequestLocationPermission() {
         val fine   = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) startLocationUpdates()
-        else {
-            requestPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates()
+        } else {
+            requestPermissionLauncher.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ))
             binding.tvStatus.text = resources.getStringArray(R.array.sayings_gps_searching).random()
         }
     }
@@ -256,7 +389,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val fine   = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (fine != PackageManager.PERMISSION_GRANTED && coarse != PackageManager.PERMISSION_GRANTED) return
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000L).setMinUpdateIntervalMillis(1500L).build()
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000L)
+            .setMinUpdateIntervalMillis(1500L).build()
         fusedLocationClient.requestLocationUpdates(request, locationCallback!!, Looper.getMainLooper())
         fusedLocationClient.lastLocation.addOnSuccessListener { it?.let { loc -> onNewLocation(loc) } }
     }
@@ -265,11 +399,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         hasLocation  = true
         bearingToDom = calcBearing(location.latitude, location.longitude, DOM_LAT, DOM_LNG).toFloat()
         distanceKm   = calcDistance(location.latitude, location.longitude, DOM_LAT, DOM_LNG)
-        updateUI()
+        // Update distance text and sayings (low frequency – only on GPS update)
+        binding.tvDistance.text = formatDistance(distanceKm)
+        binding.tvStatus.text   = sayingForDistance(distanceKm)
     }
 
     private fun calcBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val φ1 = Math.toRadians(lat1); val φ2 = Math.toRadians(lat2); val Δλ = Math.toRadians(lon2 - lon1)
+        val φ1 = Math.toRadians(lat1); val φ2 = Math.toRadians(lat2)
+        val Δλ = Math.toRadians(lon2 - lon1)
         return (Math.toDegrees(atan2(sin(Δλ)*cos(φ2), cos(φ1)*sin(φ2)-sin(φ1)*cos(φ2)*cos(Δλ))) + 360) % 360
     }
 
@@ -280,9 +417,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun bracketFor(km: Double) = when {
-        km < 0.1 -> "at_dom"; km < 0.5 -> "almost_there"; km < 2.0 -> "very_close"
-        km < 10.0 -> "close"; km < 50.0 -> "getting_closer"; km < 200.0 -> "medium_far"
-        km < 500.0 -> "far"; else -> "very_far"
+        km < 0.1   -> "at_dom";         km < 0.5   -> "almost_there"
+        km < 2.0   -> "very_close";     km < 10.0  -> "close"
+        km < 50.0  -> "getting_closer"; km < 200.0 -> "medium_far"
+        km < 500.0 -> "far";            else        -> "very_far"
     }
 
     private fun sayingForDistance(km: Double): String {
@@ -295,29 +433,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return cachedSaying
     }
 
-    private fun updateUI() {
-        rotateTo(binding.imgCompassRose, -currentAzimuth, lastRoseAngle) { lastRoseAngle = it }
-        if (hasLocation) {
-            rotateTo(binding.imgDomArrow, bearingToDom - currentAzimuth, lastNeedleAngle) { lastNeedleAngle = it }
-            binding.tvDistance.text      = formatDistance(distanceKm)
-            binding.tvStatus.text        = sayingForDistance(distanceKm)
-            binding.tvCompassStatus.text = getString(R.string.compass_heading, currentAzimuth.toInt(), bearingToDom.toInt())
-        } else {
-            binding.tvStatus.text        = resources.getStringArray(R.array.sayings_gps_searching).random()
-            binding.tvCompassStatus.text = getString(R.string.compass_heading_only, currentAzimuth.toInt())
-        }
-    }
-
-    private fun rotateTo(view: android.view.View, target: Float, last: Float, onUpdate: (Float) -> Unit) {
-        var delta = ((target - last + 180f) % 360f - 180f + 360f) % 360f
-        if (delta > 180f) delta -= 360f
-        val newAngle = last + delta
-        onUpdate(newAngle)
-        ObjectAnimator.ofFloat(view, "rotation", view.rotation, newAngle).apply {
-            duration = 200; interpolator = DecelerateInterpolator(); start()
-        }
-    }
-
     private fun formatDistance(km: Double) = when {
         km < 1.0 -> getString(R.string.distance_meters, (km * 1000).toInt())
         else     -> getString(R.string.distance_km, km).replace(".", ",")
@@ -325,7 +440,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun setupWebcamButton() {
         binding.btnWebcam.setOnClickListener {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/live/kodtgRure8Y")))
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://www.youtube.com/live/kodtgRure8Y")))
         }
     }
 }
